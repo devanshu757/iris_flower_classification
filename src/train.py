@@ -9,31 +9,33 @@ from pathlib import Path
 from sklearn.preprocessing import StandardScaler
 import pandas as pd
 
-def get_model_path(name, version):
-    """Get reliable model save path"""
+def get_model_path(name, version=""):
+    """Get reliable model save path with consistent naming"""
     current_dir = Path(__file__).parent
     model_dir = current_dir.parent / "models"
     os.makedirs(model_dir, exist_ok=True)
-    return model_dir / f"{name.lower().replace(' ', '_')}_v{version}.pkl"
+    
+    # Standardize naming: lowercase with underscores
+    model_name = name.lower().replace(' ', '_')
+    if version:
+        return model_dir / f"{model_name}_v{version}.pkl"
+    else:
+        return model_dir / f"{model_name}.pkl"
 
 # Load and preprocess data
 df, le = load_data()
 X_train, X_test, y_train, y_test, scaler = preprocess_data(df)
 
-# After preprocessing, before saving:
-scaler = StandardScaler()
-X_train = scaler.fit_transform(X_train)  # X_train should be a DataFrame
-
 # Define models
 models = {
-    "Random Forest": {
+    "random_forest": {
         "model": RandomForestClassifier(random_state=42),
         "params": {
             "n_estimators": [50, 100, 200],
             "max_depth": [None, 10, 20]
         }
     },
-    "SVM": {
+    "svm": {
         "model": SVC(probability=True, random_state=42),
         "params": {
             "C": [0.1, 1, 10],
@@ -59,13 +61,16 @@ for name, config in models.items():
     version = datetime.now().strftime("%Y%m%d")
     model_path = get_model_path(name, version)
     joblib.dump(grid.best_estimator_, model_path)
+    
+    # Also save without version for easier reference
+    joblib.dump(grid.best_estimator_, get_model_path(name))
     print(f"Saved {name} to {model_path}")
 
+# Save artifacts with consistent naming
+joblib.dump(scaler, get_model_path("scaler"))
+joblib.dump(le, get_model_path("label_encoder"))
 
-# Save artifacts
-joblib.dump(scaler, get_model_path("scaler", ""))
-joblib.dump(le, get_model_path("label_encoder", ""))
-# Save test data separately
-joblib.dump((X_test, y_test), "F:/Projects/iris_flower_classification/models/test_data.pkl")
+# Save test data
+joblib.dump((X_test, y_test), get_model_path("test_data"))
 print("Test data saved to test_data.pkl")
 print("Training completed successfully!")

@@ -33,12 +33,12 @@ models_dir = get_models_dir()
 # --- Load Artifacts ---
 try:
     models = {
-        "Random Forest": safe_load_model(models_dir / "random_forest.pkl"),
-        "SVM": safe_load_model(models_dir / "svm.pkl"),
+        "Random Forest": safe_load_model(models_dir / "random_forestv20250426.pkl"),
+        "SVM": safe_load_model(models_dir / "svm_v20250426.pkl"),
         "Stacked Ensemble": safe_load_model(models_dir / "stacked_model.pkl")
     }
-    scaler = safe_load_model(models_dir / "scaler.pkl")
-    le = safe_load_model(models_dir / "label_encoder.pkl")
+    scaler = safe_load_model(models_dir / "scaler_v.pkl")
+    le = safe_load_model(models_dir / "label_encoder_v.pkl")
 except Exception as e:
     st.error(f"Initialization failed: {str(e)}")
     st.write("Available model files:")

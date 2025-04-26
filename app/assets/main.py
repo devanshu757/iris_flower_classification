@@ -2,29 +2,61 @@ import streamlit as st
 import joblib
 import pandas as pd
 from pathlib import Path
+import os
 
-# Use absolute path
-MODEL_DIR = Path(r"F:\Projects\iris_flower_classification\models")
+# Set up paths
+MODEL_DIR = Path("models")
+os.makedirs(MODEL_DIR, exist_ok=True)
 
-def load_model(name):
-    """Load model with thorough verification"""
-    path = MODEL_DIR / f"{name.lower().replace(' ', '_')}.pkl"
-    if not path.exists():
-        st.error(f"Model file not found: {path.name}")
+def find_model_file(base_name):
+    """Find model file with flexible naming"""
+    possible_names = [
+        f"{base_name}.pkl",
+        f"{base_name.lower()}.pkl",
+        f"{base_name.replace(' ', '_')}.pkl",
+        f"{base_name.lower().replace(' ', '_')}.pkl"
+    ]
+    
+    for name in possible_names:
+        path = MODEL_DIR / name
+        if path.exists():
+            return path
+    
+    # If no exact match, try versioned files
+    versioned_files = list(MODEL_DIR.glob(f"{base_name.lower().replace(' ', '_')}*.pkl"))
+    if versioned_files:
+        return max(versioned_files, key=lambda f: f.stat().st_mtime)
+    
+    return None
+
+def load_model_safely(name):
+    """Load model with multiple fallback options"""
+    path = find_model_file(name)
+    if path is None:
+        st.error(f"Model file not found for: {name}")
         st.write("Available model files:")
-        for f in sorted(MODEL_DIR.glob("*.pkl")):
-            st.write(f"- {f.name}")
+        files = list(MODEL_DIR.glob("*.pkl"))
+        if files:
+            for f in files:
+                st.write(f"- {f.name}")
+        else:
+            st.write("No model files found in models directory")
         st.stop()
-    return joblib.load(path)
+    
+    try:
+        return joblib.load(path)
+    except Exception as e:
+        st.error(f"Error loading model {path.name}: {str(e)}")
+        st.stop()
 
-# Load all required models and artifacts
+# Load models with flexible naming
 try:
     models = {
-        "Random Forest": load_model("random_forest"),
-        "SVM": load_model("svm")
+        "Random Forest": load_model_safely("random_forest"),
+        "SVM": load_model_safely("svm")
     }
-    scaler = load_model("scaler")
-    le = load_model("label_encoder")
+    scaler = load_model_safely("scaler")
+    le = load_model_safely("label_encoder")
 except Exception as e:
     st.error(f"Initialization failed: {str(e)}")
     st.stop()

@@ -33,12 +33,12 @@ models_dir = get_models_dir()
 # --- Load Artifacts ---
 try:
     models = {
-        "Random Forest": safe_load_model(models_dir / "random_forest.pkl"),
-        "SVM": safe_load_model(models_dir / "svm.pkl"),
+        "Random Forest": safe_load_model(models_dir / "random_forest_v20250426.pkl"),
+        "SVM": safe_load_model(models_dir / "svm_v20250426.pkl"),
         "Stacked Ensemble": safe_load_model(models_dir / "stacked_model.pkl")
     }
-    scaler = safe_load_model(models_dir / "scaler.pkl")
-    le = safe_load_model(models_dir / "label_encoder.pkl")
+    scaler = safe_load_model(models_dir / "scaler_v.pkl")
+    le = safe_load_model(models_dir / "label_encoder_v.pkl")
 except Exception as e:
     st.error(f"Initialization failed: {str(e)}")
     st.write("Available model files:")
@@ -52,7 +52,6 @@ st.title("🌸 Iris Flower Classifier")
 
 # Sidebar
 model_name = st.sidebar.selectbox("Select Model", list(models.keys()))
-show_shap = st.sidebar.checkbox("Show SHAP Explanation")
 
 # Main interface
 col1, col2 = st.columns(2)
@@ -86,17 +85,6 @@ if st.button("Predict"):
         st.write("Confidence Scores:")
         st.dataframe(proba_df.style.format("{:.2%}"))
         
-        if show_shap:
-            try:
-                import shap
-                explainer = shap.Explainer(model)
-                shap_values = explainer.shap_values(input_scaled)
-                fig, ax = plt.subplots()
-                shap.plots.waterfall(shap_values[0], show=False)
-                st.pyplot(fig)
-            except Exception as e:
-                st.warning(f"SHAP explanation failed: {str(e)}")
-                
     except Exception as e:
         st.error(f"Prediction failed: {str(e)}")
 

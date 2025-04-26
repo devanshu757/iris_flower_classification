@@ -15,11 +15,11 @@ X_train, X_test, y_train, y_test, scaler = preprocess_data(df)
 models_dir = Path(__file__).parent.parent / "models"
 os.makedirs(models_dir, exist_ok=True)  # Creates directory if doesn't exist
 
-# 3. Create stacked model
+# 3. Create stacked model - use lowercase keys to match train.py
 stacked_model = StackingClassifier(
     estimators=[
-        ("rf", best_models["Random Forest"]),
-        ("svm", best_models["SVM"]),
+        ("rf", best_models["random_forest"]),  # Changed from "Random Forest" to "random_forest"
+        ("svm", best_models["svm"]),          # Changed from "SVM" to "svm"
         ("knn", KNeighborsClassifier(n_neighbors=5))
     ],
     final_estimator=LogisticRegression(),

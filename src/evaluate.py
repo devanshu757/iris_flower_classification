@@ -20,8 +20,8 @@ if __name__ == "__main__":
         models_dir = Path("F:/Projects/iris_flower_classification/models")
         
         # Load artifacts
-        scaler = joblib.load(models_dir / "scaler_v.pkl")
-        le = joblib.load(models_dir / "label_encoder_v.pkl")
+        scaler = joblib.load(models_dir / "scaler.pkl")
+        le = joblib.load(models_dir / "label_encoder.pkl")
         stacked_model = joblib.load(models_dir / "stacked_model.pkl")
 
         # Load test data (you'll need to save this separately during training)

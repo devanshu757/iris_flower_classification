@@ -15,10 +15,10 @@ def get_model_path(name, version=""):
     model_dir = current_dir.parent / "models"
     os.makedirs(model_dir, exist_ok=True)
     
-    # Standardize naming: lowercase with underscores
+    # Standardize naming: lowercase with underscores and proper version formatting
     model_name = name.lower().replace(' ', '_')
     if version:
-        return model_dir / f"{model_name}_v{version}.pkl"
+        return model_dir / f"{model_name}_v{version}.pkl"  # Ensure underscore before version
     else:
         return model_dir / f"{model_name}.pkl"
 
@@ -62,7 +62,7 @@ for name, config in models.items():
     model_path = get_model_path(name, version)
     joblib.dump(grid.best_estimator_, model_path)
     
-    # Also save without version for easier reference
+    # Save without version for easier reference
     joblib.dump(grid.best_estimator_, get_model_path(name))
     print(f"Saved {name} to {model_path}")
 

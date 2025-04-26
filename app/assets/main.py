@@ -12,7 +12,7 @@ def get_models_dir():
         base_path = Path(__file__).parent.parent
         models_dir = base_path / "models"
         if not models_dir.exists():
-            models_dir = Path("F:/Projects/iris_flower_classification/models")
+            models_dir = Path("models")  # Try local models directory
         return models_dir
     except Exception as e:
         st.error(f"Path resolution error: {str(e)}")
@@ -33,12 +33,12 @@ models_dir = get_models_dir()
 # --- Load Artifacts ---
 try:
     models = {
-        "Random Forest": safe_load_model(models_dir / "random_forest_v20250426.pkl"),
-        "SVM": safe_load_model(models_dir / "svm_v20250426.pkl"),
+        "Random Forest": safe_load_model(models_dir / "random_forest.pkl"),
+        "SVM": safe_load_model(models_dir / "svm.pkl"),
         "Stacked Ensemble": safe_load_model(models_dir / "stacked_model.pkl")
     }
-    scaler = safe_load_model(models_dir / "scaler_v.pkl")
-    le = safe_load_model(models_dir / "label_encoder_v.pkl")
+    scaler = safe_load_model(models_dir / "scaler.pkl")
+    le = safe_load_model(models_dir / "label_encoder.pkl")
 except Exception as e:
     st.error(f"Initialization failed: {str(e)}")
     st.write("Available model files:")
